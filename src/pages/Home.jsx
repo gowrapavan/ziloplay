@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import MediaRow from "../components/MediaRow";
 import Loader from "../components/Loader";
 import Hero from "../components/Hero";
+import Trailers from "../components/Trailers"; // ⬅️ add this import
 import { getTrending, getMediaList } from "../services/api";
 
 export default function Home() {
@@ -45,6 +46,8 @@ export default function Home() {
           {/* Main content with media rows */}
           <main className="mt-8">
             <MediaRow title="🔥 Trending Movies" items={trendingMovies} mediaType="movie" />
+                    <Trailers />
+
             <MediaRow title="📺 Popular TV Shows" items={popularTv} mediaType="tv" />
             <MediaRow title="🎬 Popular Movies" items={popularMovies} mediaType="movie" />
           </main>

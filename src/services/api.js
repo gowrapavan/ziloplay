@@ -10,6 +10,29 @@ export const BG_BASE_URL = "https://image.tmdb.org/t/p/original";
 export const PROFILE_IMG_BASE_URL = "https://image.tmdb.org/t/p/w185"; // Added for cast/crew profiles
 
 /**
+ * INTERNAL HELPER: Extracts the best logo from the images object.
+ * Logic: 
+ * 1. Checks if logos exist.
+ * 2. Prefers English ('en') ISO.
+ * 3. Fallback to highest vote_average if English not found.
+ * 4. Returns the file_path string or null.
+ */
+const getBestLogo = (images) => {
+  if (!images || !images.logos || images.logos.length === 0) return null;
+
+  // 1) Prefer ENGLISH logo
+  let best = images.logos.find(l => l.iso_639_1 === "en");
+
+  // 2) If not found, choose highest vote
+  if (!best) {
+    best = images.logos.sort((a, b) => b.vote_average - a.vote_average)[0];
+  }
+
+  // Return only the file path
+  return best ? best.file_path : null;
+};
+
+/**
  * A generic function to fetch data from your TMDB proxy server.
  * @param {string} endpoint - The TMDB API endpoint (e.g., '/movie/popular').
  * @param {string} [params=""] - Additional query parameters (e.g., 'query=Inception').
@@ -70,7 +93,8 @@ export const getNowPlaying = () => {
  * Fetches detailed information for a specific movie or TV show.
  * This function now uses more granular API calls for 'movie' media types
  * and combines them into a single response object.
- * @param {'movie' | 'tv'} mediaType - The type of media.
+ * * UPDATED: Now includes a 'logo' property with the best available PNG logo.
+ * * @param {'movie' | 'tv'} mediaType - The type of media.
  * @param {string | number} id - The TMDB ID of the movie or TV show.
  * @returns {Promise<object>}
  */
@@ -78,7 +102,15 @@ export const getMediaDetails = async (mediaType, id) => {
   if (mediaType === 'tv') {
     // For TV shows, we use append_to_response as not all granular endpoints exist or are named consistently.
     const params = 'append_to_response=videos,similar,credits,images,watch/providers,recommendations'; // Added recommendations for TV
-    return fetchFromTMDB(`/${mediaType}/${id}`, params);
+    const data = await fetchFromTMDB(`/${mediaType}/${id}`, params);
+
+    // Extract logo from the appended images
+    const logo = getBestLogo(data.images);
+
+    return {
+      ...data,
+      logo // Add the logo path directly to the object
+    };
   }
 
   if (mediaType === 'movie') {
@@ -93,6 +125,9 @@ export const getMediaDetails = async (mediaType, id) => {
         fetchFromTMDB(`/movie/${id}/watch/providers`)
       ]);
 
+      // Extract logo using the helper
+      const logo = getBestLogo(images);
+
       // Combine all results into one object, mimicking the 'append_to_response' structure for consistency.
       return {
         ...details,
@@ -100,6 +135,7 @@ export const getMediaDetails = async (mediaType, id) => {
         recommendations, // Direct recommendations object
         credits,
         images,
+        logo, // <--- NEW: The extracted logo path
         "watch/providers": providers // Use the key directly for watch providers
       };
     } catch (error) {
@@ -122,83 +158,6 @@ export const searchMedia = (query) => {
   const params = `query=${encodeURIComponent(query)}`;
   return fetchFromTMDB('/search/multi', params);
 };
-
-/**
- * Fetches many upcoming unreleased movie trailers
- * Combines /movie/upcoming + multiple /discover/movie pages.
- * Ensures only future release dates and valid YouTube trailers.
- * @returns {Promise<object[]>}
- 
-export const getUpcomingMovieTrailers = async () => {
-  try {
-    const today = new Date().toISOString().split("T")[0];
-    const trailers = [];
-    const seen = new Set();
-
-    const fetchTrailers = async (movies) => {
-      const validMovies = movies.filter(
-        (m) =>
-          m.release_date &&
-          new Date(m.release_date) > new Date() &&
-          !seen.has(m.id)
-      );
-
-      const promises = validMovies.map(async (movie) => {
-        const videos = await fetchFromTMDB(`/movie/${movie.id}/videos`);
-        const trailer = (videos.results || []).find(
-          (v) => v.type === "Trailer" && v.site === "YouTube"
-        );
-        if (trailer) {
-          seen.add(movie.id);
-          return {
-            id: movie.id,
-            title: movie.title,
-            videoKey: trailer.key,
-            backdrop: movie.backdrop_path,
-            poster: movie.poster_path,
-            release_date: movie.release_date,
-          };
-        }
-        return null;
-      });
-      return (await Promise.all(promises)).filter(Boolean);
-    };
-
-    // 1️⃣ Built-in Upcoming endpoint
-    const upcoming = await fetchFromTMDB(`/movie/upcoming`, `language=en-US&page=1`);
-    const upcomingMovies = upcoming.results || [];
-    trailers.push(...(await fetchTrailers(upcomingMovies)));
-
-    // 2️⃣ Discover API — fetch more pages for broader coverage
-    for (let page = 1; page <= 5; page++) {
-      const discover = await fetchFromTMDB(
-        `/discover/movie`,
-        [
-          `language=en-US`,
-          `region=US`,
-          `sort_by=primary_release_date.asc`,
-          `primary_release_date.gte=${today}`,
-          `with_release_type=2|3|4|5|6`,
-          `include_adult=false`,
-          `include_video=true`,
-          `page=${page}`,
-        ].join("&")
-      );
-      const movies = discover.results || [];
-      trailers.push(...(await fetchTrailers(movies)));
-
-      if (trailers.length >= 20) break; // stop after 20 trailers
-    }
-
-    // Remove duplicates & return top 20
-    return Array.from(new Map(trailers.map((m) => [m.id, m])).values()).slice(0, 20);
-  } catch (err) {
-    console.error("Failed to fetch unreleased movie trailers:", err);
-    return [];
-  }
-};
-*/
-
 
 /**
  * Fetches many upcoming unreleased movie trailers
@@ -267,7 +226,7 @@ export const getUpcomingMovieTrailers = async () => {
       trailers.push(...(await fetchTrailers(movies)));
 
       // UPDATED: Stop after 30 trailers
-      if (trailers.length >= 30) break; 
+      if (trailers.length >= 30) break;
     }
 
     // Remove duplicates & return top 30

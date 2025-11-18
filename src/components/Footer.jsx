@@ -13,7 +13,7 @@ export default function Footer() {
           </Link>
         </div>
         <p className="text-gray-400 text-sm">
-          &copy; {currentYear} CineFlix. All rights reserved.
+          &copy; {currentYear} Ziloplay. All rights reserved.
         </p>
         <div className="text-gray-400 text-sm">
           <p>This site does not store any files on our server, we only link to the media which is hosted on 3rd party services.</p>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>TMDB Single Logo Test</title>
+  <style>
+    body { font-family: Arial; padding:20px; max-width:600px; margin:auto;background: #000;}
+    input, button { padding:8px; font-size:1rem; }
+    img { max-width:300px; margin-top:20px; display:block; }
+  </style>
+</head>
+<body>
+
+<h2>TMDB Movie Logo Test (1 Single Logo)</h2>
+
+<input id="search" type="text" placeholder="Search movie (e.g. Dune)" />
+<button onclick="searchMovie()">Search</button>
+
+<div id="result"></div>
+<img id="logo" />
+
+<script>
+const BASE = "https://tmbd-wz5v.onrender.com";
+const IMG = "https://image.tmdb.org/t/p/original";
+
+async function searchMovie() {
+  const q = document.getElementById("search").value.trim();
+  if (!q) return alert("Enter a title");
+
+  document.getElementById("result").innerText = "Searching…";
+
+  const res = await fetch(`${BASE}/search/movie?query=${encodeURIComponent(q)}`);
+  const data = await res.json();
+
+  if (!data.results?.length) {
+    document.getElementById("result").innerText = "No results.";
+    return;
+  }
+
+  const movie = data.results[0]; // TOP RESULT ONLY
+  document.getElementById("result").innerText =
+    `Movie: ${movie.title} (ID: ${movie.id})`;
+
+  fetchLogo(movie.id);
+}
+
+async function fetchLogo(id) {
+  const res = await fetch(`${BASE}/movie/${id}/images`);
+  const images = await res.json();
+
+  let logos = images.logos || [];
+
+  // 1) Prefer ENGLISH logo
+  let best = logos.find(l => l.iso_639_1 === "en");
+
+  // 2) If not found, choose highest vote
+  if (!best && logos.length)
+    best = logos.sort((a,b)=> b.vote_average - a.vote_average)[0];
+
+  // 3) If no logos at all → fallback to poster
+  if (!best) {
+    const poster = images.posters?.[0];
+    if (poster) {
+      document.getElementById("logo").src = IMG + poster.file_path;
+    } else {
+      document.getElementById("logo").src = "";
+      document.getElementById("result").innerText += "\nNo logos/posters found!";
+    }
+    return;
+  }
+
+  // Show the chosen logo
+  document.getElementById("logo").src = IMG + best.file_path;
+}
+</script>
+
+</body>
+</html>

@@ -8,6 +8,7 @@ import TvShows from "./pages/TvShows";
 import Anime from "./pages/Anime";
 import Watch from "./pages/Watch";
 import Search from "./pages/Search"; // ✅ Import the new Search page
+import CompanyDetailsPage from './pages/CompanyDetailsPage'; // 👈 The page you want to open
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="tv-shows" element={<TvShows />} />
           <Route path="anime" element={<Anime />} />
           <Route path="watch/:mediaType/:id" element={<Watch />} />
+          <Route path="/company/:companyId" element={<CompanyDetailsPage />} />
           {/* ✅ ADDED: The new route for the search page */}
           <Route path="search" element={<Search />} />
         </Route>

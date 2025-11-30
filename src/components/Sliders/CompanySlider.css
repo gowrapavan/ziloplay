@@ -1,0 +1,65 @@
+.company-slider-container {
+  width: 100%;
+  padding: 25px 0;
+  background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.10) 0%,
+      rgba(255, 255, 255, 0.03) 40%,
+      rgba(0, 0, 0, 0) 100%
+  );
+
+  backdrop-filter: blur(7px);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+
+  overflow: hidden;
+  position: relative;
+}
+
+.company-slider-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.08),
+    rgba(255,255,255,0.03)
+  );
+  filter: blur(15px);
+  z-index: 0;
+}
+
+.company-slider-track {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  animation: scroll 32s linear infinite;
+  position: relative;
+  z-index: 5;
+}
+
+.company-slide img {
+  height: 55px;
+  object-fit: contain;
+  filter: brightness(1.3);
+  opacity: 0.9;
+  transition: 0.3s ease;
+}
+
+.company-slide img:hover {
+  opacity: 1;
+  transform: scale(1.15);
+  filter: brightness(1.7) drop-shadow(0 0 10px rgba(0,255,255,0.4));
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (max-width: 500px) {
+  .company-slide img {
+    height: 40px;
+  }
+}

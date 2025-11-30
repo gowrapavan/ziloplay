@@ -237,3 +237,65 @@ export const getUpcomingMovieTrailers = async () => {
     return [];
   }
 };
+
+
+
+/* ------------------------------------------------------------------
+   🚀 COMPANY & IMAGE HELPERS (Paste this at the bottom of api.js)
+   ------------------------------------------------------------------ */
+
+/**
+ * Helper to construct Image URLs dynamically.
+ * @param {string} path - The TMDB image path
+ * @param {string} size - The size code (e.g., "w300", "original")
+ */
+export const getImageUrl = (path, size = "w300") => {
+  if (!path) return null;
+  return `https://image.tmdb.org/t/p/${size}${path}`;
+};
+
+/**
+ * 1. Fetch Company Details (Name, Logo, Country)
+ */
+export const fetchCompanyDetails = async (companyId) => {
+  const data = await fetchFromTMDB(`/company/${companyId}`);
+  if (data.status_code === 34) {
+     throw new Error("Company not found");
+  }
+  return data;
+};
+
+/**
+ * 2. Fetch MOVIES produced by the Company
+ * Sorted by newest releases.
+ */
+/**
+ * 2. Fetch MOVIES produced by the Company
+ * Sorted by newest releases.
+ * Now supports pagination via the 'page' parameter.
+ */
+export const fetchCompanyMovies = async (companyId, page = 1) => {
+  const params = `with_companies=${companyId}&sort_by=primary_release_date.desc&page=${page}`;
+  const data = await fetchFromTMDB('/discover/movie', params);
+  
+  // Return an object containing results and total pages so UI knows when to stop
+  return {
+    results: (data.results || []).filter(item => item.poster_path),
+    totalPages: data.total_pages || 1
+  };
+};
+
+/**
+ * 3. Fetch TV SHOWS produced by the Company
+ * Sorted by newest air dates.
+ * Now supports pagination via the 'page' parameter.
+ */
+export const fetchCompanyTV = async (companyId, page = 1) => {
+  const params = `with_companies=${companyId}&sort_by=first_air_date.desc&page=${page}`;
+  const data = await fetchFromTMDB('/discover/tv', params);
+  
+  return {
+    results: (data.results || []).filter(item => item.poster_path),
+    totalPages: data.total_pages || 1
+  };
+};

@@ -1,51 +1,63 @@
-# ⚽ Goal4U: Autonomous Football Streaming & Analytics Platform
+# 🍿 Ziloplay: Modern Media Streaming Platform
 
-**Goal4U** is a cutting-edge web application designed to be a comprehensive hub for football fans. It fuses live match streaming, real-time statistical data, and curated news, showcasing an innovative, serverless architecture that relies on Python automation for data acquisition.
+**Ziloplay** is a sophisticated Single Page Application (SPA) designed for discovering, detailing, and simulating the streaming experience of movies, TV shows, and anime. Built using the modern React ecosystem, this project showcases advanced asynchronous data fetching, concurrent API design, and intuitive routing to provide a comprehensive media consumption experience.
 
-The project is built with **React** and **Vite**, utilizing a custom Python data pipeline to deliver high-speed, relevant content, particularly focusing on major leagues like La Liga, the Premier League, and the Champions League.
+## ✨ Features
 
-## ✨ Features Highlight
-
-* **Live Streaming Hub:** Features a dedicated `LiveTV` dashboard displaying ongoing matches and offers streams from multiple providers (e.g., Goal4u, Sportzonline, Hesgoal) via a clickable sidebar playlist, providing users with instant fallback options. * **Real-Time Analytics:** The platform provides dynamic "Point Table" views for major leagues, allowing users to switch between **La Liga, Premier League, Bundesliga, and Serie A** tables, complete with comprehensive statistics (MP, W, D, L, GF, GA, GD, PTS). * **Match Countdown:** A prominent widget displays a countdown clock to the next major fixture (e.g., **Liverpool FC vs. Brighton & Hove Albion FC**), ensuring users never miss a kickoff.
-* **Curated News & Highlights:** The homepage integrates a **Recent News** feed with headlines and images (e.g., Xabi Alonso, Messi/Guardiola feature) and includes a **Presentation** section showcasing historical or highlight videos. * **Data Automation Pipeline:** The system uses Python scripts for **multi-source scraping** of live stream URLs and leverages a **GitHub-as-Database** approach, where structured JSON files are fetched by the React frontend for all dynamic content.
+* **Custom Watch Player:** Provides a multi-server streaming experience on the media detail page. The `ServerButtons` component allows users to dynamically switch between several external streaming providers (e.g., Videasy, VidKing) using both TMDB and IMDb IDs.
+* **API Proxy Architecture:** All communication with the TMDB API is routed through a centralized proxy server (`https://tmbd-wz5v.onrender.com`), abstracting the API key and ensuring client-side security.
+* **Concurrent Details Fetching:** The core `getMediaDetails` function for movies utilizes `Promise.all` to concurrently fetch details, videos, recommendations, credits, images, and watch providers, drastically reducing load times.
+* **Advanced Trailer Curation:** The specialized `Trailers` component displays upcoming movie trailers using the **YouTube Iframe API**, featuring autoplay, mute controls, and logic for dynamically loading the next video and showing a "Skip" button.
+* **Deep Studio/Company Dive:** Dedicated routing (`/company/:companyId`) and API logic allow users to view the full, paginated filmography (Movies and TV Shows) produced by a specific company (`CompanyDetailsPage.jsx`).
+* **Comprehensive Search:** The `Search.jsx` page supports multi-search and allows filtering results by "All," "Movies," or "TV Shows" with an adaptive, modern UI.
 
 ## 🛠️ Tech Stack
 
 | Technology | Category | Purpose |
 | :--- | :--- | :--- |
-| **React / JavaScript** | Frontend Core | Component-based UI development and application logic. |
-| **Vite** | Build Tooling | Fast development environment and optimized module bundling. |
-| **Tailwind CSS / Bootstrap 5** | Styling | Responsive, utility-first styling for a modern interface. |
-| **Python (Scripts)** | Backend Automation | Web scraping stream links and coordinating data into JSON. |
-| **GitHub (`shortsdata` repo)** | Data Layer | Serverless backend storage and consumption of dynamic JSON data. |
-| **React Router** | Routing | Management of application routes (Home, Live, Point Table, etc.). |
+| **React** | Frontend Core | UI development and component logic. |
+| **Vite** | Build Tooling | Fast development environment and optimized production builds. |
+| **React Router v6** | Routing | Declarative routing, including dynamic paths (`/watch/:mediaType/:id`). |
+| **TMDB (The Movie DB)** | Data Source | Metadata, images, cast/crew, and watch provider data. |
+| **Custom Proxy Server** | Data Layer | Securing the TMDB API key and centralizing fetch logic. |
+| **YouTube Iframe API** | Media Playback | Handling embedded, interactive trailer playback. |
 
 ## 🚀 Getting Started
 
-To run the Goal4U frontend locally, you must first ensure your companion Python data scripts are running or the JSON files are available in the linked GitHub repository.
+Follow these instructions to set up and run the Ziloplay project locally.
 
 ### 1. Prerequisites
 
 Ensure you have Node.js (which includes npm) installed on your system.
 
 ### 2. Clone the Repository
+```
+git clone <repository-url> cd ziloplay
+```
 
-```
-git clone <repository-url>
-cd goal4u
-```
 ### 3. Install Dependencies
-Bash
 ```
 npm install
-# or
+```
+or
+```
 yarn install
 ```
-### 4. Data Layer Setup
-Ensure the Python scraping scripts (used to populate the JSON files consumed via `https://raw.githubusercontent.com/gowrapavan/shortsdata/main/...)` are executed regularly to provide fresh data.
+
+### 4. API Configuration
+
+This application relies on a functional external API proxy:
+
+* **Base URL:** The application is configured to use `const TMDB_BASE_URL = "https://tmbd-wz5v.onrender.com";`.
+* **Local Setup:** If you are running the companion proxy server locally, update this URL in `src/services/api.js` to point to your local backend endpoint (e.g., `"http://localhost:3000"`).
 
 ### 5. Run the Development Server
 ```
 npm run dev
 ```
-The application will start and be available in your browser at http://localhost:5173 (or similar port).
+or
+```
+yarn dev
+```
+
+The application will start and be available in your browser at `http://localhost:5173` (or similar port).

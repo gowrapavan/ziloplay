@@ -1,12 +1,14 @@
 import { useState } from "react";
 import EpisodeSelector from "./EpisodeSelector";
 
-// Updated server list based on your documentation
+// Updated server list including VidLink and VidSrc
 const Servers = [
   { name: "Videasy", url: (id, s, e, type) => type === 'movie' ? `https://player.videasy.net/movie/${id}` : `https://player.videasy.net/tv/${id}/${s}/${e}`, type: "tmdb" },
   { name: "VidKing", url: (id, s, e, type) => type === 'movie' ? `https://www.vidking.net/embed/movie/${id}` : `https://www.vidking.net/embed/tv/${id}/${s}/${e}`, type: "tmdb" },
   { name: "2Embed", url: (id, s, e, type) => type === 'movie' ? `https://www.2embed.cc/embed/${id}` : `https://www.2embed.cc/embedtv/${id}&s=${s}&e=${e}`, type: "tmdb" },
   { name: "MoviesClub", url: (id, s, e, type) => type === 'movie' ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${s}-${e}`, type: "imdb" },
+  { name: "VidLink", url: (id, s, e, type) => type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`, type: "tmdb" },
+  { name: "VidSrc", url: (id, s, e, type) => type === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`, type: "tmdb" },
 ];
 
 export default function Player({ media, mediaType }) {
@@ -59,7 +61,7 @@ export default function Player({ media, mediaType }) {
       <div className="relative pb-[56.25%] h-0 rounded-xl overflow-hidden shadow-2xl bg-black">
         {src ? (
           <iframe
-            key={src} // Add key to force re-render on src change
+            key={src} // Force re-render on src change
             src={src}
             className="absolute top-0 left-0 w-full h-full"
             allowFullScreen

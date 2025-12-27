@@ -9,7 +9,7 @@ const Servers = [
   { name: "MoviesClub", url: (id, s, e, type) => type === 'movie' ? `https://moviesapi.club/movie/${id}` : `https://moviesapi.club/tv/${id}-${s}-${e}`, type: "imdb" },
   { name: "VidLink", url: (id, s, e, type) => type === 'movie' ? `https://vidlink.pro/movie/${id}` : `https://vidlink.pro/tv/${id}/${s}/${e}`, type: "tmdb" },
   { name: "VidSrc", url: (id, s, e, type) => type === 'movie' ? `https://vidsrc.cc/v2/embed/movie/${id}` : `https://vidsrc.cc/v2/embed/tv/${id}/${s}/${e}`, type: "tmdb" },
-  { name: "Flixer", url: (id, s, e, type) => type === 'movie' ? `https://flixer.sh/watch/movie/${id}` : `https://flixer.sh/watch//tv/${id}/${s}/${e}`, type: "tmdb" },
+  { name: "Flixer", url: (id, s, e, type) => type === 'movie' ? `https://flixer.sh/watch/movie/${id}` : `https://flixer.sh/watch/tv/${id}/${s}/${e}`, type: "tmdb" },
 ];
 
 export default function Player({ media, mediaType }) {

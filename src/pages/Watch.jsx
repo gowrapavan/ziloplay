@@ -1,10 +1,11 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import Player from "../components/Player";
 import MediaRow from "../components/MediaRow";
+import EpisodeSelector from "../components/EpisodeSelector"; 
 import { getMediaDetails, IMG_BASE_URL, BG_BASE_URL, PROFILE_IMG_BASE_URL } from "../services/api";
-import { getAnimeDetails, getAnimeRecommendations } from "../services/jikan"; // Assuming you have a jikan service
+import { getAnimeDetails, getAnimeRecommendations } from "../services/jikan";
 
 // --- Helper Components ---
 
@@ -15,30 +16,55 @@ const GenreBadge = ({ genre }) => (
 );
 
 const DetailItem = ({ label, value }) => {
-    if (!value) return null;
-    return (
-        <div className="flex justify-between border-b border-gray-700 py-2 text-sm">
-            <span className="font-semibold text-gray-400">{label}</span>
-            <span className="text-gray-200 text-right">{value}</span>
-        </div>
-    );
+  if (!value) return null;
+  return (
+    <div className="flex justify-between border-b border-gray-700 py-2 text-sm">
+      <span className="font-semibold text-gray-400">{label}</span>
+      <span className="text-gray-200 text-right">{value}</span>
+    </div>
+  );
 };
 
 const PersonCard = ({ person }) => {
-  const profilePath = person.profile_path ? `${PROFILE_IMG_BASE_URL}${person.profile_path}` : 'https://placehold.co/185x278/1f2937/9ca3af?text=No+Photo';
+  const profilePath = person.profile_path
+    ? `${PROFILE_IMG_BASE_URL}${person.profile_path}`
+    : 'https://placehold.co/185x278/1f2937/9ca3af?text=No+Photo';
+
   const role = person.character || person.job;
 
   return (
-    <div className="flex flex-col items-center text-center">
-      <img
-        src={profilePath}
-        alt={person.name}
-        className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-gray-700"
-        onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/185x278/1f2937/9ca3af?text=No+Photo'; }}
-      />
-      <p className="text-white text-sm font-semibold mt-2 truncate w-full px-1" title={person.name}>{person.name}</p>
-      {role && <p className="text-gray-400 text-xs truncate w-full px-1" title={role}>{role}</p>}
-    </div>
+    <Link
+      to={`/actor/${person.id}`}
+      className="flex flex-col items-center text-center group transition-transform duration-300 hover:scale-110"
+    >
+      <div className="relative">
+        <img
+          src={profilePath}
+          alt={person.name}
+          className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-2 border-gray-700 group-hover:border-red-500 transition-colors shadow-lg"
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://placehold.co/185x278/1f2937/9ca3af?text=No+Photo';
+          }}
+        />
+      </div>
+
+      <p
+        className="text-white text-sm font-semibold mt-2 truncate w-full px-1 group-hover:text-red-400 transition-colors"
+        title={person.name}
+      >
+        {person.name}
+      </p>
+
+      {role && (
+        <p
+          className="text-gray-400 text-xs truncate w-full px-1"
+          title={role}
+        >
+          {role}
+        </p>
+      )}
+    </Link>
   );
 };
 
@@ -127,7 +153,7 @@ const MediaGallery = ({ backdrops, posters, onImageClick }) => (
     {backdrops?.length > 0 && (
       <>
         <h3 className="text-lg font-semibold text-gray-300 mb-2">Backdrops</h3>
-        <div className="flex overflow-x-auto gap-3 pb-4">
+        <div className="flex overflow-x-auto gap-3 pb-4 scrollbar-hide">
           {backdrops.map((img, index) => (
             <img
               key={`backdrop-${index}`}
@@ -143,7 +169,7 @@ const MediaGallery = ({ backdrops, posters, onImageClick }) => (
     {posters?.length > 0 && (
       <>
         <h3 className="text-lg font-semibold text-gray-300 mt-4 mb-2">Posters</h3>
-        <div className="flex overflow-x-auto gap-3 pb-4">
+        <div className="flex overflow-x-auto gap-3 pb-4 scrollbar-hide">
           {posters.map((img, index) => (
             <img
               key={`poster-${index}`}
@@ -259,7 +285,6 @@ const TruncatedText = ({ text, limit = 200 }) => {
   );
 };
 
-
 // --- Main Watch Component ---
 
 export default function Watch() {
@@ -270,10 +295,19 @@ export default function Watch() {
   const [loading, setLoading] = useState(true);
   const [modalImageSrc, setModalImageSrc] = useState(null);
 
+  // New state for TV Tracking (Season/Episode)
+  const [activeSeason, setActiveSeason] = useState(1);
+  const [activeEpisode, setActiveEpisode] = useState(1);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     setMedia(null);
     setLoading(true);
+    
+    // Reset selection for new series
+    setActiveSeason(1);
+    setActiveEpisode(1);
+
     async function load() {
       try {
         let data, recs = [];
@@ -284,7 +318,7 @@ export default function Watch() {
           data = await getAnimeDetails(id);
           recs = await getAnimeRecommendations(id);
         } else {
-            navigate('/');
+          navigate('/');
         }
         setMedia(data);
         setRecommendations(recs);
@@ -297,17 +331,31 @@ export default function Watch() {
     load();
   }, [id, mediaType, navigate]);
 
-  // Data normalization
+  const handleEpisodeSelect = (season, episode) => {
+    setActiveSeason(season);
+    setActiveEpisode(episode);
+    // Smooth scroll to player when an episode is selected
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  };
+
   const title = media?.title || media?.name;
+
+  useEffect(() => {
+    if (title) {
+      const episodeInfo = mediaType === 'tv' ? ` (S${activeSeason} E${activeEpisode})` : '';
+      document.title = `Watch ${title}${episodeInfo} only on Ziloplay`;
+    }
+  }, [title, activeSeason, activeEpisode, mediaType]);
+
   const posterPath = media?.images?.posters?.[0]?.file_path || media?.poster_path;
   const backdropPath = media?.images?.backdrops?.[0]?.file_path || media?.backdrop_path;
   const releaseDate = media?.release_date || media?.first_air_date || media?.aired?.from;
   const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : 'N/A';
   const runtime = media?.runtime ? `${Math.floor(media.runtime / 60)}h ${media.runtime % 60}m` : (media?.duration || 'N/A');
-  
+
   const trailer = media?.videos?.results?.find((v) => v.type === "Trailer" && v.site === "YouTube");
   const otherVideos = media?.videos?.results?.filter(v => v.id !== trailer?.id) || [];
-  
+
   const providers = media ? media["watch/providers"] : null;
   const cast = media?.credits?.cast?.slice(0, 10);
   const crew = media?.credits?.crew?.filter(c => ['Director', 'Writer', 'Producer'].includes(c.job)).slice(0, 5);
@@ -315,7 +363,7 @@ export default function Watch() {
   return (
     <>
       {modalImageSrc && <ImageModal src={modalImageSrc} onClose={() => setModalImageSrc(null)} />}
-      
+
       {loading ? (
         <Loader />
       ) : !media ? (
@@ -325,18 +373,18 @@ export default function Watch() {
           <div className="relative h-[40vh] md:h-[60vh] bg-cover bg-top" style={{ backgroundImage: `url('${BG_BASE_URL}${backdropPath}')` }}>
             <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/50 to-transparent"></div>
           </div>
-          
-          <div className="px-5 md:px-8 max-w-7xl mx-auto -mt-32 md:-mt-80 relative z-10">
+
+          <div className="px-5 md:px-8 max-w-7xl mx-auto -mt-32 md:-mt-80 relative z-10 pb-20 text-white">
             <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-              <img 
-                src={`${IMG_BASE_URL}${posterPath}`} 
-                alt={title} 
-                className="w-48 md:w-72 rounded-lg shadow-2xl flex-shrink-0 object-cover" 
+              <img
+                src={`${IMG_BASE_URL}${posterPath}`}
+                alt={title}
+                className="w-48 md:w-72 rounded-lg shadow-2xl flex-shrink-0 object-cover border border-white/10"
                 onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/500x750/1f2937/9ca3af?text=No+Image'; }}
               />
               <div className="flex-1 text-center md:text-left pt-0 md:pt-16">
                 <h1 className="text-3xl md:text-5xl font-bold">{title}</h1>
-                <div className="flex items-center justify-center md:justify-start gap-4 text-gray-400 my-3">
+                <div className="flex items-center justify-center md:justify-start gap-4 text-gray-400 my-3 font-medium">
                   <span>{releaseYear}</span>
                   {media.vote_average > 0 && <span>{media.vote_average.toFixed(1)} / 10</span>}
                   <span>{runtime}</span>
@@ -347,119 +395,125 @@ export default function Watch() {
                 <TruncatedText text={media.overview || media.synopsis} limit={200} />
               </div>
             </div>
-            
+
             <div className="mt-12">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-12 gap-y-8">
-                  {/* ===== LEFT COLUMN (Span 2) ===== */}
-                  <div className="lg:col-span-2 space-y-12">
-                      {/* 1. Stream Player */}
-                      <section className="-mx-5 md:mx-0">
-                          <h2 className="text-2xl font-semibold mb-4 text-red-500 px-5 md:px-0">Watch Now</h2>
-                          <div className="rounded-none md:rounded-xl overflow-hidden">
-                              {(mediaType === 'movie' || mediaType === 'tv') ? (
-                                  <Player media={media} mediaType={mediaType} />
-                              ) : (
-                                  <p className="text-gray-400 p-5 md:p-0">Anime player coming soon!</p>
-                              )}
-                          </div>
-                      </section>
-                      
-                      {/* 2. Clips & Featurettes */}
-                      {otherVideos.length > 0 && (
-                          <div className="-mx-5 md:mx-0">
-                              <div className="px-5 md:px-0">
-                                  <VideoSlideshow videos={otherVideos} />
-                              </div>
-                          </div>
+                {/* ===== LEFT COLUMN (Span 2) ===== */}
+                <div className="lg:col-span-2 space-y-12">
+                  {/* 1. Stream Player */}
+                  <section className="-mx-5 md:mx-0">
+                    <h2 className="text-2xl font-semibold mb-6 text-red-500 px-5 md:px-0 uppercase tracking-wide">Watch Now</h2>
+                    
+                    <div className="rounded-none md:rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                      {(mediaType === 'movie' || mediaType === 'tv') ? (
+                        <Player 
+                          media={media} 
+                          mediaType={mediaType}
+                          season={activeSeason}
+                          episode={activeEpisode}
+                        />
+                      ) : (
+                        <p className="text-gray-400 p-5 md:p-0">Anime player coming soon!</p>
                       )}
-                  </div>
+                    </div>
+                  </section>
 
-                  {/* ===== RIGHT COLUMN (Span 1) ===== */}
-                  <div className="space-y-12">
-                      {/* 1. Trailer */}
-                      {trailer && (
-                          <section className="-mx-5 md:mx-0">
-                              <h2 className="text-2xl font-semibold mb-4 px-5 md:px-0">Official Trailer</h2>
-                              <div className="relative pb-[56.25%] h-0 rounded-none md:rounded-xl overflow-hidden shadow-lg">
-                                  <iframe 
-                                      src={`https://www.youtube.com/embed/${trailer.key}?autoplay=0&controls=1&modestbranding=1&rel=0`}
-                                      className="absolute top-0 left-0 w-full h-full" 
-                                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                      allowFullScreen 
-                                      title="Official Trailer"
-                                  ></iframe>
-                              </div>
-                          </section>
-                      )}
-                      
-                      {/* 2. Details */}
-                      <section>
-                          <h2 className="text-2xl font-semibold mb-4">Details</h2>
-                          <div className="bg-gray-900/50 p-4 rounded-lg space-y-2">
-                              <DetailItem label="Status" value={media.status} />
-                              <DetailItem label="Release Date" value={releaseDate?.split('T')[0]} />
-                              {mediaType === 'tv' && <DetailItem label="Seasons" value={media.number_of_seasons} />}
-                              {mediaType === 'tv' && <DetailItem label="Episodes" value={media.number_of_episodes} />}
-                              <DetailItem label="Original Language" value={media.original_language?.toUpperCase()} />
-                          </div>
-                      </section>
+                  {/* 2. Clips & Featurettes */}
+                  {otherVideos.length > 0 && (
+                    <div className="-mx-5 md:mx-0">
+                      <div className="px-5 md:px-0">
+                        <VideoSlideshow videos={otherVideos} />
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                      {/* 3. Where to Watch */}
-                      {providers && (
-                          <section>
-                              <h2 className="text-2xl font-semibold mb-4">Where to Watch</h2>
-                              <WatchProviders providers={providers} />
-                          </section>
-                      )}
-                  </div>
+                {/* ===== RIGHT COLUMN (Span 1) ===== */}
+                <div className="space-y-12">
+                  {/* 1. Trailer */}
+                  {trailer && (
+                    <section className="-mx-5 md:mx-0">
+                      <h2 className="text-2xl font-semibold mb-6 px-5 md:px-0 uppercase tracking-wide">Official Trailer</h2>
+                      <div className="relative pb-[56.25%] h-0 rounded-none md:rounded-xl overflow-hidden shadow-lg border border-white/5">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${trailer.key}?autoplay=0&controls=1&modestbranding=1&rel=0`}
+                          className="absolute top-0 left-0 w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title="Official Trailer"
+                        ></iframe>
+                      </div>
+                    </section>
+                  )}
+
+                  {/* 2. Details */}
+                  <section>
+                    <h2 className="text-2xl font-semibold mb-6 uppercase tracking-wide">Details</h2>
+                    <div className="bg-gray-900/40 backdrop-blur-sm p-5 rounded-xl space-y-2 border border-white/5 shadow-inner">
+                      <DetailItem label="Status" value={media.status} />
+                      <DetailItem label="Release Date" value={releaseDate?.split('T')[0]} />
+                      {mediaType === 'tv' && <DetailItem label="Seasons" value={media.number_of_seasons} />}
+                      {mediaType === 'tv' && <DetailItem label="Episodes" value={media.number_of_episodes} />}
+                      <DetailItem label="Original Language" value={media.original_language?.toUpperCase()} />
+                    </div>
+                  </section>
+
+                  {/* 3. Where to Watch */}
+                  {providers && (
+                    <section>
+                      <h2 className="text-2xl font-semibold mb-6 uppercase tracking-wide">Where to Watch</h2>
+                      <WatchProviders providers={providers} />
+                    </section>
+                  )}
+                </div>
               </div>
 
               {/* ===== FULL WIDTH SECTIONS (Below Grid) ===== */}
-              <div className="mt-12 space-y-12">
-                  {/* 1. Cast */}
-                  {cast && cast.length > 0 && (
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Top Cast</h2>
-                      <div className="flex overflow-x-auto gap-4 pb-4">
-                        {cast.map(person => (
-                          <div key={person.credit_id} className="flex-shrink-0 w-24">
-                            <PersonCard person={person} />
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  )}
+              <div className="mt-16 space-y-16">
+                {/* 1. Cast */}
+                {cast && cast.length > 0 && (
+                  <section>
+                    <h2 className="text-2xl font-semibold mb-6 uppercase tracking-wide">Top Cast</h2>
+                    <div className="flex overflow-x-auto gap-6 pb-6 scrollbar-hide">
+                      {cast.map(person => (
+                        <div key={person.credit_id} className="flex-shrink-0 w-24">
+                          <PersonCard person={person} />
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
 
-                  {/* 2. Crew */}
-                  {crew && crew.length > 0 && (
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Key Crew</h2>
-                      <div className="flex flex-wrap gap-x-6 gap-y-4">
-                        {crew.map(person => (
-                          <div key={person.credit_id} className="flex-shrink-0 w-32 md:w-40">
-                            <PersonCard person={person} />
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  )}
+                {/* 2. Crew */}
+                {crew && crew.length > 0 && (
+                  <section>
+                    <h2 className="text-2xl font-semibold mb-6 uppercase tracking-wide">Key Crew</h2>
+                    <div className="flex flex-wrap gap-x-8 gap-y-6">
+                      {crew.map(person => (
+                        <div key={person.credit_id} className="flex-shrink-0 w-32 md:w-40">
+                          <PersonCard person={person} />
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
 
-                  {/* 3. Media Gallery */}
-                  {(media.images?.backdrops?.length > 0 || media.images?.posters?.length > 0) && (
-                    <MediaGallery 
-                      backdrops={media.images.backdrops} 
-                      posters={media.images.posters} 
-                      onImageClick={setModalImageSrc} 
-                    />
-                  )}
-                  
-                  {/* 4. Recommendations */}
-                  {recommendations?.length > 0 && (
-                    <section>
-                      <h2 className="text-2xl font-semibold mb-4">Recommendations</h2>
-                      <MediaRow items={recommendations} mediaType={mediaType} />
-                    </section>
-                  )}
+                {/* 3. Media Gallery */}
+                {(media.images?.backdrops?.length > 0 || media.images?.posters?.length > 0) && (
+                  <MediaGallery
+                    backdrops={media.images.backdrops}
+                    posters={media.images.posters}
+                    onImageClick={setModalImageSrc}
+                  />
+                )}
+
+                {/* 4. Recommendations */}
+                {recommendations?.length > 0 && (
+                  <section>
+                    <div className="h-px bg-white/5 w-full mb-12" />
+                    <MediaRow title="Recommendations" items={recommendations} mediaType={mediaType} />
+                  </section>
+                )}
               </div>
             </div>
           </div>

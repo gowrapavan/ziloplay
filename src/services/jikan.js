@@ -1,55 +1,54 @@
-// Jikan API Configuration
-const JIKAN_BASE_URL = "https://api.jikan.moe/v4";
+export const JIKAN_BASE = 'https://api.jikan.moe/v4';
 
-/**
- * A generic function to fetch data from the Jikan API.
- * @param {string} endpoint - The Jikan API endpoint (e.g., '/top/anime').
- * @returns {Promise<object>} - The JSON response from the API.
- */
-const fetchFromJikan = async (endpoint) => {
-  const url = `${JIKAN_BASE_URL}${endpoint}`;
+async function fetchJikan(endpoint) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+
   try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.error("Jikan API request failed with status:", res.status);
-      throw new Error(`Failed to fetch data from Jikan`);
+    const response = await fetch(`${JIKAN_BASE}${endpoint}`, {
+      signal: controller.signal,
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'HiAnime-App/1.0',
+        'Cache-Control': 'no-cache',
+      },
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+      }
+      if (response.status >= 500) {
+        throw new Error('Server error. Please try again in a few moments.');
+      }
+      throw new Error(`Jikan API error: ${response.status}`);
     }
-    // The Jikan API wraps results in a 'data' object.
-    const responseData = await res.json();
-    return responseData.data;
+    return response.json();
   } catch (error) {
-    console.error("Error in fetchFromJikan:", error);
-    return []; // Return an empty array on error
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout. The server is taking too long to respond.');
+    }
+    throw error;
   }
+}
+
+export const jikanApi = {
+  getTopAiring: () => fetchJikan('/top/anime?filter=airing&limit=20'),
+  getMostPopular: () => fetchJikan('/top/anime?filter=bypopularity&limit=20'),
+  getUpcoming: () => fetchJikan('/top/anime?filter=upcoming&limit=20'),
+  getAnimeDetails: (malId) => fetchJikan(`/anime/${malId}/full`),
+  getAnimeRecommendations: (malId) => fetchJikan(`/anime/${malId}/recommendations`),
 };
 
-// --- EXPORTED JIKAN API FUNCTIONS ---
-
-/**
- * Fetches top anime lists by category.
- * @param {'airing' | 'upcoming' | 'bypopularity' | 'favorite'} filter - The category to fetch.
- * @returns {Promise<Array>}
- */
-export const getTopAnime = (filter = 'bypopularity') => {
-  return fetchFromJikan(`/top/anime?filter=${filter}&limit=20`);
+// Explicitly export functions to fix the SyntaxError in Anime.jsx
+export const getTopAnime = async (filter) => {
+    if (filter === 'airing') return jikanApi.getTopAiring();
+    if (filter === 'upcoming') return jikanApi.getUpcoming();
+    return jikanApi.getMostPopular();
 };
 
-/**
- * Fetches detailed information for a specific anime.
- * @param {string | number} id - The MyAnimeList ID of the anime.
- * @returns {Promise<object>}
- */
-export const getAnimeDetails = (id) => {
-  return fetchFromJikan(`/anime/${id}/full`);
-};
-
-/**
- * Fetches recommended anime based on a given anime ID.
- * @param {string | number} id - The MyAnimeList ID of the anime.
- * @returns {Promise<Array>}
- */
-export const getAnimeRecommendations = async (id) => {
-    const recommendations = await fetchFromJikan(`/anime/${id}/recommendations`);
-    // The recommendation data is nested, so we map over it to get the entry details
-    return recommendations.map(rec => rec.entry) || [];
-};
+export const getAnimeDetails = (id) => jikanApi.getAnimeDetails(id);
+export const getAnimeRecommendations = (id) => jikanApi.getAnimeRecommendations(id);

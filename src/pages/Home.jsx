@@ -2,18 +2,22 @@ import { useEffect, useState } from "react";
 import MediaRow from "../components/MediaRow";
 import Loader from "../components/Loader";
 import Hero from "../components/Hero";
+import NewsSlider from "../components/NewsSlider"; // ⬅️ Add this import
 import MovieCompanySlider from "../components/Sliders/MovieCompanySlider";
-import Trailers from "../components/Trailers"; // ⬅️ add this import
+import Trailers from "../components/Trailers";
 import { getTrending, getMediaList } from "../services/api";
 
 export default function Home() {
-  // State for the page's own content
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [popularMovies, setPopularMovies] = useState([]);
   const [popularTv, setPopularTv] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Effect to fetch initial page data once on mount
+  // Set the Browser Tab Title
+  useEffect(() => {
+    document.title = "Ziloplay - Watch Movies & TV Shows Online";
+  }, []);
+
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -33,7 +37,7 @@ export default function Home() {
       }
     }
     load();
-  }, []); // Empty dependency array means this runs only once
+  }, []);
 
   return (
     <>
@@ -41,13 +45,11 @@ export default function Home() {
         <Loader />
       ) : (
         <>
-          {/* Hero slideshow now uses the trending movies data */}
           <Hero items={trendingMovies} />
-
-          {/* Main content with media rows */}
           <main className="mt-8">
             <MediaRow title="🔥 Trending Movies" items={trendingMovies} mediaType="movie" />
             <MovieCompanySlider />
+            <NewsSlider />
             <Trailers />
             <MediaRow title="📺 Popular TV Shows" items={popularTv} mediaType="tv" />
             <MediaRow title="🎬 Popular Movies" items={popularMovies} mediaType="movie" />

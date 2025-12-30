@@ -238,6 +238,7 @@ export const getUpcomingMovieTrailers = async () => {
   }
 };
 
+/*------------------------------------------------------------------------------- */
 
 
 /* ------------------------------------------------------------------
@@ -298,4 +299,30 @@ export const fetchCompanyTV = async (companyId, page = 1) => {
     results: (data.results || []).filter(item => item.poster_path),
     totalPages: data.total_pages || 1
   };
+};
+
+
+/*------------------------------------------------------------------------------- */
+
+
+/**
+ * Fetches actor details including biography and all movie/TV credits.
+ */
+export const getActorDetails = async (id) => {
+  // Added 'images' here so it comes back in the same object
+  const params = "append_to_response=combined_credits,external_ids,images";
+  return fetchFromTMDB(`/person/${id}`, params);
+};
+/**
+ * Fetches all available profile photos for a specific actor.
+ */
+export const getActorImages = (personId) => {
+  return fetchFromTMDB(`/person/${personId}/images`);
+};
+
+/**
+ * Fetches episodes for a specific season of a TV show.
+ */
+export const getSeasonDetails = (seriesId, seasonNumber) => {
+  return fetchFromTMDB(`/tv/${seriesId}/season/${seasonNumber}`);
 };

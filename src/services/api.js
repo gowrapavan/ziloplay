@@ -326,3 +326,13 @@ export const getActorImages = (personId) => {
 export const getSeasonDetails = (seriesId, seasonNumber) => {
   return fetchFromTMDB(`/tv/${seriesId}/season/${seasonNumber}`);
 };
+
+
+/**
+ * Fetches popular actors (people) from TMDB.
+ * Uses proxy server – NO API KEY on frontend.
+ */
+export const getPopularActors = async () => {
+  const data = await fetchFromTMDB("/person/popular");
+  return data.results || [];
+};

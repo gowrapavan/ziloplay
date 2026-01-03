@@ -6,6 +6,8 @@ import NewsSlider from "../components/NewsSlider"; // ⬅️ Add this import
 import MovieCompanySlider from "../components/Sliders/MovieCompanySlider";
 import Trailers from "../components/Trailers";
 import { getTrending, getMediaList } from "../services/api";
+import PopularActors from "../components/PopularActors";
+
 
 export default function Home() {
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -50,9 +52,12 @@ export default function Home() {
             <MediaRow title="🔥 Trending Movies" items={trendingMovies} mediaType="movie" />
             <MovieCompanySlider />
             <NewsSlider />
-            <Trailers />
+            <PopularActors />
+
             <MediaRow title="📺 Popular TV Shows" items={popularTv} mediaType="tv" />
             <MediaRow title="🎬 Popular Movies" items={popularMovies} mediaType="movie" />
+                        <Trailers />
+
           </main>
         </>
       )}

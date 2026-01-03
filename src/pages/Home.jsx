@@ -7,6 +7,7 @@ import MovieCompanySlider from "../components/Sliders/MovieCompanySlider";
 import Trailers from "../components/Trailers";
 import { getTrending, getMediaList } from "../services/api";
 import PopularActors from "../components/Home_Page/PopularActors";
+import PopularDirectors from "../components/Home_Page/PopularDirectors";
 
 
 export default function Home() {
@@ -53,6 +54,8 @@ export default function Home() {
             <MovieCompanySlider />
             <NewsSlider />
             <PopularActors />
+            
+            <PopularDirectors />
 
             <MediaRow title="📺 Popular TV Shows" items={popularTv} mediaType="tv" />
             <MediaRow title="🎬 Popular Movies" items={popularMovies} mediaType="movie" />

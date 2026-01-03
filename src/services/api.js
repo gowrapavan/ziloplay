@@ -336,3 +336,22 @@ export const getPopularActors = async () => {
   const data = await fetchFromTMDB("/person/popular");
   return data.results || [];
 };
+
+export const getPopularDirectors = async () => {
+  const popularMovies = await fetchFromTMDB("/movie/popular");
+  let directors = [];
+
+  for (let movie of popularMovies.results.slice(0, 10)) { // limit to 10 movies for performance
+    const credits = await fetchFromTMDB(`/movie/${movie.id}/credits`);
+    const movieDirectors = (credits.crew || []).filter(
+      (c) => c.job === "Director" && c.profile_path
+    );
+    directors.push(...movieDirectors);
+  }
+
+  // Remove duplicates by ID
+  const uniqueDirectors = Array.from(new Map(directors.map(d => [d.id, d])).values());
+
+  return uniqueDirectors;
+};
+

@@ -167,25 +167,22 @@ export default function ActorDetails() {
 
         {/* 4. Filmography Sections */}
         <div className="mt-20 space-y-24">
-          {movieCredits.length > 0 && (
-            <section>
-              <div className="flex items-center justify-between mb-8 px-2">
-                <h2 className="text-3xl font-bold tracking-tight">Featured Movies</h2>
-                <span className="bg-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">{movieCredits.length} Credits</span>
-              </div>
-              <MediaRow items={movieCredits} mediaType="movie" />
-            </section>
-          )}
+     {movieCredits.length > 0 && (
+  <MediaRow
+    title={`Featured Movies (${movieCredits.length})`}
+    items={movieCredits}
+    mediaType="movie"
+  />
+)}
 
-          {tvCredits.length > 0 && (
-            <section>
-              <div className="flex items-center justify-between mb-8 px-2">
-                <h2 className="text-3xl font-bold tracking-tight">TV Series & Shows</h2>
-                <span className="bg-red-600 px-3 py-1 rounded-full text-[10px] font-black uppercase">{tvCredits.length} Credits</span>
-              </div>
-              <MediaRow items={tvCredits} mediaType="tv" />
-            </section>
-          )}
+{tvCredits.length > 0 && (
+  <MediaRow
+    title={`TV Series & Shows (${tvCredits.length})`}
+    items={tvCredits}
+    mediaType="tv"
+  />
+)}
+
         </div>
       </div>
     </div>

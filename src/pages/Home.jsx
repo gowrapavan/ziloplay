@@ -6,7 +6,7 @@ import NewsSlider from "../components/NewsSlider"; // ⬅️ Add this import
 import MovieCompanySlider from "../components/Sliders/MovieCompanySlider";
 import Trailers from "../components/Trailers";
 import { getTrending, getMediaList } from "../services/api";
-import PopularActors from "../components/PopularActors";
+import PopularActors from "../components/Home_Page/PopularActors";
 
 
 export default function Home() {

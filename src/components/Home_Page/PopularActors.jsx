@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getPopularActors, PROFILE_IMG_BASE_URL } from "../services/api";
-import Loader from "./Loader";
+import { getPopularActors, PROFILE_IMG_BASE_URL } from "../../services/api";
+import Loader from "../Loader";
 
 export default function PopularActors() {
   const [actors, setActors] = useState([]);

@@ -375,9 +375,17 @@ export default function Watch() {
             <meta name="description" content={media.overview?.substring(0, 160) || `Stream ${title} online.`} />
             
             {/* Social Media Cards */}
-            <meta property="og:title" content={`Watch ${title} on ZiloPlay`} />
-            <meta property="og:description" content={media.overview || "Watch now in HD."} />
-            <meta property="og:image" content={`${IMG_BASE_URL}${posterPath}`} />
+            {/* Force Large Landscape Image for Twitter/X & Discord */}
+              <meta name="twitter:card" content="summary_large_image" />
+              
+              {/* Standard Open Graph Tags */}
+              <meta property="og:title" content={`Watch ${title} on ZiloPlay`} />
+              <meta property="og:description" content={media.overview || "Watch now in HD."} />
+              
+              {/* Use the Backdrop (Landscape) instead of Poster (Portrait) if available */}
+              <meta property="og:image" content={`${IMG_BASE_URL}${backdropPath || posterPath}`} />
+              <meta property="og:image:width" content="1200" />
+              <meta property="og:image:height" content="630" />
           </Helmet>
           <div className="relative h-[40vh] md:h-[60vh] bg-cover bg-top" style={{ backgroundImage: `url('${BG_BASE_URL}${backdropPath}')` }}>
             <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/50 to-transparent"></div>

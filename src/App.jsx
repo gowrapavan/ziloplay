@@ -12,6 +12,7 @@ import AnimeWatch from "./pages/AnimeWatch"; // Import the new page
 import Search from "./pages/Search";
 import CompanyDetailsPage from './pages/CompanyDetailsPage';
 import ScrollToTop from "./components/ScrollToTop"; // Ensure this component is created
+import Watchlist from "./pages/Watchlist"; // Import the page
 
 export default function App() {
   
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="watch/:mediaType/:id" element={<Watch />} />
           <Route path="watch/anime/:id" element={<AnimeWatch />} />
           <Route path="news" element={<NewsPage />} />
+          <Route path="watchlist" element={<Watchlist />} />
           <Route path="company/:companyId" element={<CompanyDetailsPage />} />
           <Route path="search" element={<Search />} />
         </Route>

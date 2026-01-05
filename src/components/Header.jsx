@@ -70,6 +70,7 @@ export default function Header() {
             <NavLink to="/movies" className={navLinkClass}>Movies</NavLink>
             <NavLink to="/tv-shows" className={navLinkClass}>TV Shows</NavLink>
             <NavLink to="/anime" className={navLinkClass}>Anime</NavLink>
+            <NavLink to="/watchlist" className={navLinkClass}>Watchlist</NavLink>
           </nav>
         </div>
 

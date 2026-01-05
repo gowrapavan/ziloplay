@@ -5,6 +5,7 @@ import Loader from "../components/Loader";
 import Hero from "../components/Hero";
 import NewsSlider from "../components/NewsSlider";
 import MovieCompanySlider from "../components/Sliders/MovieCompanySlider";
+import ContinueWatchingRow from "../components/Home_Page/ContinueWatchingRow";
 import Trailers from "../components/Trailers";
 import { getTrending, getMediaList } from "../services/api";
 import PopularActors from "../components/Home_Page/PopularActors";
@@ -59,6 +60,7 @@ export default function Home() {
           <Hero items={trendingMovies} />
           <main className="mt-8">
             <MediaRow title="🔥 Trending Movies" items={trendingMovies} mediaType="movie" />
+            <ContinueWatchingRow /> {/* ⬅️ Add it here */}
             <MovieCompanySlider />
             <NewsSlider />
             <PopularActors />

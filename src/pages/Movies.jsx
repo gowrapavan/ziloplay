@@ -49,8 +49,13 @@ export default function Movies() {
   return (
     <div>
       <main className="pt-24">
-        <h1 className="text-3xl font-bold text-white text-center mb-8">Movies</h1>
-        {searchResults ? (
+   <div className="flex items-center justify-center gap-3 mb-7">
+              <div className="h-8 w-1.5 bg-red-600 rounded-full" />
+
+          <h1 className="text-4xl font-black text-white uppercase tracking-tighter">
+            Watch <span className="text-red-600">   Movies</span>
+          </h1>
+        </div>        {searchResults ? (
           <MediaRow title="Search Results" items={searchResults} mediaType="movie" />
         ) : (
           <>

@@ -1,5 +1,6 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useStorage } from "../hooks/useStorage"; // ⬅️ ADD THIS
 import Loader from "../components/Loader";
 import Player from "../components/Player";
 import MediaRow from "../components/MediaRow";
@@ -15,6 +16,7 @@ const GenreBadge = ({ genre }) => (
     {genre.name}
   </span>
 );
+
 
 const DetailItem = ({ label, value }) => {
   if (!value) return null;
@@ -286,11 +288,17 @@ const TruncatedText = ({ text, limit = 200 }) => {
   );
 };
 
+
+
+
+
 // --- Main Watch Component ---
 
 export default function Watch() {
   const { mediaType, id } = useParams();
   const navigate = useNavigate();
+// 1. Initialize Storage Hook ⬅️ ADD THIS
+  const { watchlist, toggleWatchlist, isInWatchlist, addToContinueWatching } = useStorage();
   const [media, setMedia] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -299,6 +307,25 @@ export default function Watch() {
   // New state for TV Tracking (Season/Episode)
   const [activeSeason, setActiveSeason] = useState(1);
   const [activeEpisode, setActiveEpisode] = useState(1);
+  const watchlistItem = media ? {
+      ...media,
+      id: id,              // Ensures ID is always current
+      mediaType: mediaType // Solves the 'undefined' link issue
+    } : null;
+  // 2. Save to Continue Watching when media loads ⬅️ ADD THIS
+  useEffect(() => {
+    if (media && !loading) {
+      addToContinueWatching({
+        id,
+        mediaType,
+        title: media.title || media.name,
+        poster_path: media.poster_path,
+        season: activeSeason, 
+        episode: activeEpisode,
+        timestamp: new Date().getTime()
+      });
+    }
+  }, [media, loading, activeSeason, activeEpisode, id, mediaType]); // Added dependencies for safety
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -306,7 +333,7 @@ export default function Watch() {
     setLoading(true);
     
     // Reset selection for new series
-    setActiveSeason(1);
+    setActiveSeason(1); 
     setActiveEpisode(1);
 
     async function load() {
@@ -436,8 +463,35 @@ export default function Watch() {
                 {/* ===== LEFT COLUMN (Span 2) ===== */}
                 <div className="lg:col-span-2 space-y-12">
                   {/* 1. Stream Player */}
-                  <section className="-mx-5 md:mx-0">
-                    <h2 className="text-2xl font-semibold mb-6 text-red-500 px-5 md:px-0 uppercase tracking-wide">Watch Now</h2>
+                <section className="-mx-5 md:mx-0">
+                    
+                    {/* ⬇️ UPDATED HEADER WITH WATCHLIST BUTTON ⬇️ */}
+                    <div className="flex justify-between items-center mb-6 px-5 md:px-0">
+                      <h2 className="text-2xl font-semibold text-red-500 uppercase tracking-wide">
+                        Watch Now
+                      </h2>
+                                            
+<button 
+  onClick={() => toggleWatchlist(watchlistItem)} 
+  className={`flex items-center justify-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold transition-all duration-300 border backdrop-blur-md shadow-xl text-xs md:text-base ${
+    watchlist.some(i => i.id.toString() === id.toString())
+    ? "bg-red-600 border-red-500 text-white hover:bg-red-700 hover:scale-105 w-full md:w-auto" 
+    : "bg-white/10 border-white/20 text-gray-200 hover:bg-white/20 hover:border-white/40 w-full md:w-auto"
+  }`}
+>
+  {watchlist.some(i => i.id.toString() === id.toString()) ? (
+    <>
+      <span className="text-base md:text-lg">❤️</span>
+      <span>In Watchlist</span>
+    </>
+  ) : (
+    <>
+      <span className="text-base md:text-lg">➕</span>
+      <span>Add to Watchlist</span>
+    </>
+  )}
+</button>
+                    </div>
                     
                     <div className="rounded-none md:rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
                       {(mediaType === 'movie' || mediaType === 'tv') ? (

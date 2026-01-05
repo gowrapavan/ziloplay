@@ -386,6 +386,24 @@ export default function Watch() {
               <meta property="og:image" content={`${IMG_BASE_URL}${backdropPath || posterPath}`} />
               <meta property="og:image:width" content="1200" />
               <meta property="og:image:height" content="630" />
+              {/* Inside <Helmet> ... */}
+              <script type="application/ld+json">
+                {JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": mediaType === 'tv' ? "TVSeries" : "Movie",
+                  "name": title,
+                  "image": `${IMG_BASE_URL}${posterPath}`,
+                  "description": media.overview,
+                  "datePublished": releaseDate,
+                  "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": media.vote_average,
+                    "bestRating": "10",
+                    "ratingCount": media.vote_count
+                  },
+                  "genre": media.genres?.map(g => g.name)
+                })}
+              </script>
           </Helmet>
           <div className="relative h-[40vh] md:h-[60vh] bg-cover bg-top" style={{ backgroundImage: `url('${BG_BASE_URL}${backdropPath}')` }}>
             <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/50 to-transparent"></div>

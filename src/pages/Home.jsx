@@ -55,10 +55,11 @@ export default function Home() {
             <NewsSlider />
             <PopularActors />
             
-            <PopularDirectors />
 
             <MediaRow title="📺 Popular TV Shows" items={popularTv} mediaType="tv" />
             <MediaRow title="🎬 Popular Movies" items={popularMovies} mediaType="movie" />
+                        <PopularDirectors />
+
                         <Trailers />
 
           </main>

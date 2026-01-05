@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import Player from "../components/Player";
 import MediaRow from "../components/MediaRow";
+import { Helmet } from "react-helmet-async";  
 import EpisodeSelector from "../components/EpisodeSelector"; 
 import { getMediaDetails, IMG_BASE_URL, BG_BASE_URL, PROFILE_IMG_BASE_URL } from "../services/api";
 import { getAnimeDetails, getAnimeRecommendations } from "../services/jikan";
@@ -340,12 +341,6 @@ export default function Watch() {
 
   const title = media?.title || media?.name;
 
-  useEffect(() => {
-    if (title) {
-      const episodeInfo = mediaType === 'tv' ? ` (S${activeSeason} E${activeEpisode})` : '';
-      document.title = `Watch ${title}${episodeInfo} only on Ziloplay`;
-    }
-  }, [title, activeSeason, activeEpisode, mediaType]);
 
   const posterPath = media?.images?.posters?.[0]?.file_path || media?.poster_path;
   const backdropPath = media?.images?.backdrops?.[0]?.file_path || media?.backdrop_path;
@@ -370,6 +365,20 @@ export default function Watch() {
         <p className="text-center text-red-500 pt-28">Failed to load media data. Please try again later.</p>
       ) : (
         <div>
+          {/* ✅ ADD THIS BLOCK */}
+          <Helmet>
+            <title>
+              {mediaType === 'tv' 
+                ? `Watch ${title} S${activeSeason}:E${activeEpisode} - ZiloPlay`
+                : `Watch ${title} (${releaseYear}) - ZiloPlay`}
+            </title>
+            <meta name="description" content={media.overview?.substring(0, 160) || `Stream ${title} online.`} />
+            
+            {/* Social Media Cards */}
+            <meta property="og:title" content={`Watch ${title} on ZiloPlay`} />
+            <meta property="og:description" content={media.overview || "Watch now in HD."} />
+            <meta property="og:image" content={`${IMG_BASE_URL}${posterPath}`} />
+          </Helmet>
           <div className="relative h-[40vh] md:h-[60vh] bg-cover bg-top" style={{ backgroundImage: `url('${BG_BASE_URL}${backdropPath}')` }}>
             <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/50 to-transparent"></div>
           </div>

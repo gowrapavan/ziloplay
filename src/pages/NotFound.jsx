@@ -1,10 +1,19 @@
 import { Link } from "react-router-dom";
 import { FaPlay, FaExclamationTriangle } from "react-icons/fa";
+import { Helmet } from "react-helmet-async"; // Import Helmet
 
 export default function NotFound() {
   return (
     <div className="relative min-h-screen w-full bg-black flex flex-col items-center justify-center overflow-hidden font-sans text-white perspective-1000">
       
+      {/* 🚀 SEO Configuration for 404 Page */}
+      <Helmet>
+        <title>404 - Page Not Found | ZiloPlay</title>
+        <meta name="description" content="The page you are looking for does not exist." />
+        {/* Force the favicon just in case, though index.html usually handles it */}
+        <link rel="icon" type="image/png" href="/favicon.png" />
+      </Helmet>
+
       {/* ==================== LAYER 1: INFINITE GRID FLOOR (CGI) ==================== */}
       <div 
         className="absolute bottom-0 w-[200vw] h-[100vh] origin-bottom"

@@ -1,1 +1,7 @@
+# Force Netlify to serve these specific files correctly
+/sitemap.xml  /sitemap.xml  200
+/robots.txt   /robots.txt   200
+/logo.png     /logo.png     200
+
+# Then, send everything else to React (SPA Catch-all)
 /* /index.html  200

@@ -23,17 +23,25 @@ export default function Player({ media, mediaType }) {
     setEpisode(e);
   };
 
+  // IDs logic
   const id = mediaType === 'anime' ? media.mal_id : media.id;
-  const imdbId = media.external_ids?.imdb_id;
+  // Fallback check for IMDB ID (check both external_ids and the root media object)
+  const imdbId = media.external_ids?.imdb_id || media.imdb_id;
 
   const currentServer = Servers[activeServer];
   const serverId = currentServer.type === 'tmdb' ? id : imdbId;
   const src = serverId ? currentServer.url(serverId, season, episode, mediaType) : '';
 
   return (
-    // Reduced container margin-bottom to fix the gap
     <div className="mb-2 space-y-3 md:space-y-4">
       
+      {/* 0. Browser Disclaimer */}
+      <div className="bg-red-600/10 border border-red-600/20 rounded-2xl p-3 text-center">
+        <p className="text-[10px] md:text-xs font-bold text-red-500 uppercase tracking-widest">
+          Tip: Use <span className="text-white underline">JioSphere</span> or <span className="text-white underline">Brave Browser</span> to block all ads.
+        </p>
+      </div>
+
       {/* 1. TV Episode Selector */}
       {mediaType === 'tv' && media.seasons && (
         <EpisodeSelector
@@ -55,29 +63,34 @@ export default function Player({ media, mediaType }) {
         </div>
 
         <div className="flex flex-wrap gap-2 md:gap-3">
-          {Servers.map((s, i) => (
-            <button
-              key={s.name}
-              onClick={() => setActiveServer(i)}
-              disabled={s.type === 'imdb' && !imdbId}
-              className={`relative flex items-center gap-2 font-bold py-2 px-4 md:py-3 md:px-5 rounded-xl transition-all duration-300 border text-[11px] md:text-sm ${
-                activeServer === i
-                  ? "bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(229,9,20,0.3)]"
-                  : "bg-[#0a0a0a] border-white/10 text-gray-400 hover:border-red-600/50 hover:text-white"
-              } disabled:opacity-30 disabled:cursor-not-allowed`}
-            >
-              {s.name}
-            </button>
-          ))}
+          {Servers.map((s, i) => {
+            // Check if server should be disabled based on ID availability
+            const isDisabled = s.type === 'imdb' && !imdbId;
+            
+            return (
+              <button
+                key={s.name}
+                onClick={() => setActiveServer(i)}
+                disabled={isDisabled}
+                className={`font-bold px-4 py-2 text-xs border transition ${
+                  activeServer === i
+                    ? "bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(229,9,20,0.3)]"
+                    : "bg-[#0a0a0a] border-white/10 text-gray-400 hover:border-red-600/50 hover:text-white"
+                } ${isDisabled ? "opacity-20 cursor-not-allowed grayscale" : ""}`}
+              >
+                {s.name}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* 3. The Player Container - Rounded curves on desktop, flush on mobile */}
+      {/* 3. The Player Container */}
       <div className="relative -mx-5 md:mx-0"> 
         <div className="relative pb-[56.25%] h-0 rounded-none md:rounded-[2rem] overflow-hidden shadow-2xl bg-black border-y md:border border-white/5">
           {src ? (
             <iframe
-              key={src}
+              key={src} 
               src={src}
               className="absolute top-0 left-0 w-full h-full"
               allowFullScreen
@@ -86,18 +99,24 @@ export default function Player({ media, mediaType }) {
             ></iframe>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
-              <p className="text-sm font-medium tracking-wide">Select an episode to start.</p>
+              <p className="text-sm font-medium tracking-wide">
+                {!serverId && currentServer.type === 'imdb' 
+                  ? "IMDB ID missing for this server." 
+                  : "Select content to start."}
+              </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* 4. Tips & Watching Status - Matched exactly to image_db2e56.png */}
+      {/* 4. Tips & Watching Status */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-4 px-2">
         <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.15em] text-gray-500">
           <span className="hover:text-white cursor-help transition-colors">Ads? Try VidLink or VidSrc</span>
           <span className="h-1 w-1 bg-gray-700 rounded-full" />
-          <span className="text-gray-400">Watching S{season} E{episode}</span>
+          <span className="text-gray-400 uppercase">
+            {mediaType === 'movie' ? "Watching Now" : `Watching S${season} E${episode}`}
+          </span>
         </div>
         
         <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400 bg-white/5 px-4 py-2 rounded-full border border-white/10 uppercase tracking-tighter shadow-sm">

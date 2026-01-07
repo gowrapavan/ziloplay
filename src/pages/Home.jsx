@@ -17,9 +17,6 @@ export default function Home() {
   const [popularTv, setPopularTv] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ❌ Removed the manual useEffect for document.title
-  // Helmet handles this better below
-
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -51,6 +48,25 @@ export default function Home() {
           content="Stream the latest movies, trending TV shows, and anime on ZiloPlay. Explore popular actors, trailers, and news." 
         />
         <link rel="canonical" href="https://ziloplay.netlify.app/" />
+
+        {/* 👇 THIS SCRIPT FIXES THE "NETLIFY" NAME ISSUE */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "ZiloPlay",
+            "alternateName": ["Zilo Play", "ZiloPlay Stream"],
+            "url": "https://ziloplay.netlify.app/",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://ziloplay.netlify.app/search?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          })}
+        </script>
       </Helmet>
 
       {loading ? (
@@ -60,7 +76,7 @@ export default function Home() {
           <Hero items={trendingMovies} />
           <main className="mt-8">
             <MediaRow title="🔥 Trending Movies" items={trendingMovies} mediaType="movie" />
-            <ContinueWatchingRow /> {/* ⬅️ Add it here */}
+            <ContinueWatchingRow /> 
             <MovieCompanySlider />
             <NewsSlider />
             <PopularActors />

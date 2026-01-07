@@ -7,6 +7,7 @@ import TvShows from "./pages/TvShows";
 import Anime from "./pages/Anime";
 import ActorDetails from "./pages/ActorDetails";
 import NewsPage from "./pages/NewsPage";
+import NotFound from "./pages/NotFound";
 import Watch from "./pages/Watch";
 import AnimeWatch from "./pages/AnimeWatch"; // Import the new page
 import Search from "./pages/Search";
@@ -59,6 +60,7 @@ export default function App() {
           <Route path="watchlist" element={<Watchlist />} />
           <Route path="company/:companyId" element={<CompanyDetailsPage />} />
           <Route path="search" element={<Search />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </BrowserRouter>

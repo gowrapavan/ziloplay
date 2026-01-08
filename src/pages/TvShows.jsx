@@ -54,10 +54,10 @@ export default function TvShows() {
           <MediaRow title="Search Results" items={searchResults} mediaType="tv" />
         ) : (
           <>
-            <MediaRow title="🔥 Trending This Week" items={trending} mediaType="tv" />
-            <MediaRow title="📺 Popular TV Shows" items={popular} mediaType="tv" />
-            <MediaRow title="⭐ Top Rated TV Shows" items={topRated} mediaType="tv" />
-            <MediaRow title="📡 Currently Airing" items={onTheAir} mediaType="tv" />
+          <MediaRow title="🔥 Trending This Week" items={trending} mediaType="tv" category="trending" />
+          <MediaRow title="📺 Popular TV Shows" items={popular} mediaType="tv" category="popular" />
+          <MediaRow title="⭐ Top Rated TV Shows" items={topRated} mediaType="tv" category="top_rated" />
+          <MediaRow title="📡 Currently Airing" items={onTheAir} mediaType="tv" category="on_the_air" />
           </>
         )}
       </main>

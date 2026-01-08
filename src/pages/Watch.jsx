@@ -463,37 +463,42 @@ export default function Watch() {
                 {/* ===== LEFT COLUMN (Span 2) ===== */}
                 <div className="lg:col-span-2 space-y-12">
                   {/* 1. Stream Player */}
-                <section className="-mx-5 md:mx-0">
+                  <section className="-mx-5 md:mx-0">
                     
-                    {/* ⬇️ UPDATED HEADER WITH WATCHLIST BUTTON ⬇️ */}
-                    <div className="flex justify-between items-center mb-6 px-5 md:px-0">
-                      <h2 className="text-2xl font-semibold text-red-500 uppercase tracking-wide">
+                    {/* ⬇️ UPDATED HEADER WITH PRIME-STYLE WATCHLIST BUTTON ⬇️ */}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 px-5 md:px-0 gap-4">
+                      <h2 className="text-2xl font-bold text-white uppercase tracking-wider border-l-4 border-[#e31a27] pl-3">
                         Watch Now
-                      </h2>
-                                            
-<button 
-  onClick={() => toggleWatchlist(watchlistItem)} 
-  className={`flex items-center justify-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-lg md:rounded-xl font-semibold transition-all duration-300 border backdrop-blur-md shadow-xl text-xs md:text-base ${
-    watchlist.some(i => i.id.toString() === id.toString())
-    ? "bg-red-600 border-red-500 text-white hover:bg-red-700 hover:scale-105 w-full md:w-auto" 
-    : "bg-white/10 border-white/20 text-gray-200 hover:bg-white/20 hover:border-white/40 w-full md:w-auto"
-  }`}
->
-  {watchlist.some(i => i.id.toString() === id.toString()) ? (
-    <>
-      <span className="text-base md:text-lg">❤️</span>
-      <span>In Watchlist</span>
-    </>
-  ) : (
-    <>
-      <span className="text-base md:text-lg">➕</span>
-      <span>Add to Watchlist</span>
-    </>
-  )}
-</button>
+                      </h2>                                                                                                    
+                      
+                      <button 
+                        onClick={() => toggleWatchlist(watchlistItem)} 
+                        className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-[8px] font-bold transition-all duration-300 shadow-lg text-sm md:text-base w-full md:w-auto ${
+                          watchlist.some(i => i.id.toString() === id.toString())
+                          ? "bg-white text-[#e31a27] border-2 border-white" 
+                          : "bg-[#e31a27] text-white border-2 border-[#e31a27] hover:bg-[#ff1f2d] hover:border-[#ff1f2d]"
+                        }`}
+                      >
+                        {watchlist.some(i => i.id.toString() === id.toString()) ? (
+                          <>
+                            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                            <span>In Watchlist</span>
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            <span>Add to Watchlist</span>
+                          </>
+                        )}
+                      </button>
                     </div>
                     
-                    <div className="rounded-none md:rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+                    {/* Player Container */}
+                    <div className="rounded-none md:rounded-[12px] overflow-hidden shadow-2xl ring-1 ring-white/10 bg-black">
                       {(mediaType === 'movie' || mediaType === 'tv') ? (
                         <Player 
                           media={media} 
@@ -502,7 +507,9 @@ export default function Watch() {
                           episode={activeEpisode}
                         />
                       ) : (
-                        <p className="text-gray-400 p-5 md:p-0">Anime player coming soon!</p>
+                        <div className="flex items-center justify-center h-[300px] bg-[#1a1a1a]">
+                          <p className="text-gray-400 font-medium tracking-wide">Anime player coming soon!</p>
+                        </div>
                       )}
                     </div>
                   </section>

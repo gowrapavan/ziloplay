@@ -20,6 +20,27 @@ export default function MediaCard({ item, mediaType }) {
   const rawRating = item.vote_average || item.score;
   const rating = rawRating ? rawRating.toFixed(1) : null;
 
+  const AdCard = () => (
+  <a 
+    href="https://anipop.netlify.app" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="relative group overflow-hidden rounded-xl bg-gradient-to-br from-red-900/40 to-black border border-white/10 hover:border-red-600 transition-all duration-300 flex flex-col items-center justify-center p-4 h-full min-h-[250px]"
+  >
+    <div className="text-center">
+      <h3 className="text-red-600 font-black text-xl mb-2 italic">AniPop</h3>
+      <p className="text-gray-300 text-xs font-medium uppercase tracking-widest mb-4">
+        Watch Anime Here
+      </p>
+      <div className="px-4 py-2 bg-red-600 text-white text-[10px] font-bold rounded-full uppercase group-hover:scale-110 transition-transform">
+        Visit Site
+      </div>
+    </div>
+    {/* Optional background glow */}
+    <div className="absolute -bottom-10 -right-10 w-24 h-24 bg-red-600/20 blur-3xl rounded-full group-hover:bg-red-600/40 transition-all" />
+  </a>
+);
+
   // Safety check
   if (!id) return null;
 

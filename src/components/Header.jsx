@@ -149,6 +149,7 @@ export default function Header() {
           <NavLink to="/movies" onClick={closeMobileMenu} className={({isActive}) => `text-3xl font-bold transition-all hover:scale-110 ${isActive ? 'text-[#E50914]' : 'text-gray-300 hover:text-white'}`}>Movies</NavLink>
           <NavLink to="/tv-shows" onClick={closeMobileMenu} className={({isActive}) => `text-3xl font-bold transition-all hover:scale-110 ${isActive ? 'text-[#E50914]' : 'text-gray-300 hover:text-white'}`}>TV Shows</NavLink>
           <NavLink to="/anime" onClick={closeMobileMenu} className={({isActive}) => `text-3xl font-bold transition-all hover:scale-110 ${isActive ? 'text-[#E50914]' : 'text-gray-300 hover:text-white'}`}>Anime</NavLink>
+          <NavLink to="/watchlist" onClick={closeMobileMenu} className={({isActive}) => `text-3xl font-bold transition-all hover:scale-110 ${isActive ? 'text-[#E50914]' : 'text-gray-300 hover:text-white'}`}>Watchlist</NavLink>
         </nav>
       </div>
     </>

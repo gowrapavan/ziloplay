@@ -15,20 +15,27 @@ export default function Home() {
   const [trendingMovies, setTrendingMovies] = useState([]);
   const [popularMovies, setPopularMovies] = useState([]);
   const [popularTv, setPopularTv] = useState([]);
+  // 1️⃣ NEW STATE for Top Rated
+  const [topRatedMovies, setTopRatedMovies] = useState([]); 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       try {
-        const [trendingData, popularMovieData, popularTvData] = await Promise.all([
+        // 2️⃣ ADD 'top_rated' fetch to Promise.all
+        const [trendingData, popularMovieData, popularTvData, topRatedData] = await Promise.all([
           getTrending('movie', 'week'),
           getMediaList('movie', 'popular'),
           getMediaList('tv', 'popular'),
+          getMediaList('movie', 'top_rated'), // Fetches Top Rated Movies
         ]);
+
         setTrendingMovies(trendingData.results);
         setPopularMovies(popularMovieData.results);
         setPopularTv(popularTvData.results);
+        // 3️⃣ SET the state
+        setTopRatedMovies(topRatedData.results); 
       } catch (error) {
         console.error("Failed to fetch initial data:", error);
       } finally {
@@ -74,15 +81,15 @@ export default function Home() {
       ) : (
         <>
           <Hero items={trendingMovies} />
-          <main className="mt-8">
-            <MediaRow title="🔥 Trending Movies" items={trendingMovies} mediaType="movie" />
+          <main className="mt-8">            
+            <MediaRow title="🔥 Trending Movies" items={trendingMovies} mediaType="movie" category="trending" />
             <ContinueWatchingRow /> 
             <MovieCompanySlider />
             <NewsSlider />
-            <PopularActors />
-            
-            <MediaRow title="📺 Popular TV Shows" items={popularTv} mediaType="tv" />
-            <MediaRow title="🎬 Popular Movies" items={popularMovies} mediaType="movie" />
+            <PopularActors />                       
+            <MediaRow title="⭐ Top Rated Masterpieces" items={topRatedMovies} mediaType="movie" category="top_rated" />              
+            <MediaRow title="📺 Popular TV Shows" items={popularTv} mediaType="tv" category="popular" />
+            <MediaRow title="🎬 Popular Movies" items={popularMovies} mediaType="movie" category="popular" />
             <PopularDirectors />
             <Trailers />
           </main>

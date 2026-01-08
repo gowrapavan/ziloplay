@@ -59,10 +59,10 @@ export default function Movies() {
           <MediaRow title="Search Results" items={searchResults} mediaType="movie" />
         ) : (
           <>
-            <MediaRow title="🔥 Trending This Week" items={trending} mediaType="movie" />
-            <MediaRow title="🎬 Popular Movies" items={popular} mediaType="movie" />
-            <MediaRow title="⭐ Top Rated Movies" items={topRated} mediaType="movie" />
-            <MediaRow title="🍿 Upcoming Movies" items={upcoming} mediaType="movie" />
+        <MediaRow title="🔥 Trending This Week" items={trending} mediaType="movie" category="trending" />
+        <MediaRow title="🎬 Popular Movies" items={popular} mediaType="movie" category="popular" />
+        <MediaRow title="⭐ Top Rated Movies" items={topRated} mediaType="movie" category="top_rated" />
+        <MediaRow title="🍿 Upcoming Movies" items={upcoming} mediaType="movie" category="upcoming" />
           </>
         )}
       </main>

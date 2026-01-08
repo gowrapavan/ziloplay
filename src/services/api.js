@@ -66,18 +66,17 @@ const fetchFromTMDB = async (endpoint, params = "") => {
  * @param {'popular' | 'top_rated' | 'upcoming' | 'on_the_air' | 'now_playing'} category - The category to fetch.
  * @returns {Promise<object>}
  */
-export const getMediaList = (mediaType, category) => {
-  return fetchFromTMDB(`/${mediaType}/${category}`);
+export const getMediaList = (mediaType, category, page = 1) => {
+  return fetchFromTMDB(`/${mediaType}/${category}`, `page=${page}`);
 };
-
 /**
  * Fetches trending media based on popularity.
  * @param {'all' | 'movie' | 'tv'} mediaType - The type of media to fetch.
  * @param {'day' | 'week'} timeWindow - The time window for trending.
  * @returns {Promise<object>}
  */
-export const getTrending = (mediaType = 'all', timeWindow = 'week') => {
-  return fetchFromTMDB(`/trending/${mediaType}/${timeWindow}`);
+export const getTrending = (mediaType = 'all', timeWindow = 'week', page = 1) => {
+  return fetchFromTMDB(`/trending/${mediaType}/${timeWindow}`, `page=${page}`);
 };
 
 /**

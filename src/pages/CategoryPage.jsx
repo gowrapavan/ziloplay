@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { getMediaList, getTrending } from "../services/api";
 import Loader from "../components/Loader";
-import MediaCard from "../components/MediaCard";
+import SearchCard from "../components/Search/SearchCard";
 
 const AdCard = () => (
   <a 
@@ -84,7 +84,7 @@ export default function CategoryPage() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-6 pb-20">
-        {items.map((item) => <MediaCard key={item.id} item={item} mediaType={type} />)}
+        {items.map((item) => <SearchCard key={item.id} item={item} mediaType={type} />)}
         {items.length > 0 && <AdCard />}
       </div>
 
